@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Validasi — Assistant Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1F5C99;--blue-light:#E6F1FB;--blue-mid:#2E75B6;
+  --teal:#1D9E75;--teal-light:#E1F5EE;
+  --amber:#D4870A;--amber-light:#FEF3DC;
+  --coral:#C1440E;--coral-light:#FAECE7;
+  --purple:#5B4DBE;--purple-light:#EEEDFE;
+  --green:#27500A;--green-light:#EAF3DE;
+  --gray:#F7F6F3;--gray-mid:#E8E6E0;--gray-dark:#D0CEC8;
+  --text:#1A1A1A;--text-sec:#6B6B6B;--text-hint:#A0A0A0;
+  --white:#FFFFFF;--radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray);color:var(--text);min-height:100vh;padding-bottom:100px;-webkit-text-size-adjust:100%}
+/* iPhone fix: semua elemen interaktif harus punya cursor pointer */
+button,select,input,textarea{-webkit-appearance:none;appearance:none;cursor:pointer}
+textarea{-webkit-appearance:none;resize:vertical}
+
+/* HEADER */
+.header{background:var(--blue);padding:20px 16px 16px;position:sticky;top:0;z-index:100}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.header-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:.08em;text-transform:uppercase}
+.header h1{font-size:18px;font-weight:700;color:#fff}
+.week-badge{background:rgba(255,255,255,0.15);color:#fff;font-size:12px;font-weight:500;padding:5px 10px;border-radius:20px;white-space:nowrap}
+
+/* PROGRESS STEPS */
+.steps{display:flex;gap:0;margin:14px 16px 0;background:var(--white);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow)}
+.step{flex:1;padding:10px 4px;text-align:center;font-size:10px;font-weight:600;color:var(--text-hint);border-right:1px solid var(--gray-mid);cursor:pointer;transition:all .2s;background:var(--white);border-top:none;border-bottom:none;border-left:none;font-family:'Plus Jakarta Sans',sans-serif;line-height:1.2}
+.step:last-child{border-right:none}
+.step.active{background:var(--blue);color:#fff}
+.step.done{background:var(--teal-light);color:var(--teal)}
+.step-num{display:block;font-size:15px;font-weight:700;margin-bottom:2px}
+
+/* PAGE */
+.page{display:none}.page.visible{display:block}
+
+/* SECTION */
+.section-card{margin:12px 16px 0;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.section-head{padding:14px 16px;border-bottom:1px solid var(--gray-mid);display:flex;align-items:center;gap:10px}
+.section-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.section-head h2{font-size:14px;font-weight:700;color:var(--text)}
+.section-head p{font-size:12px;color:var(--text-sec);margin-top:2px}
+.section-body{padding:14px 16px}
+
+/* FORM FIELDS */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-sec);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border:1.5px solid var(--gray-mid);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;color:var(--text);background:var(--white);transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.5;-webkit-appearance:none}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B6B' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* SCORE SELECTOR */
+.score-group{display:flex;gap:8px}
+.score-btn{flex:1;padding:14px 6px;border-radius:var(--radius-sm);border:2px solid var(--gray-mid);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;background:var(--white);color:var(--text-sec);text-align:center;transition:all .2s;min-height:48px;-webkit-appearance:none}
+.score-btn.C.selected{background:var(--teal);border-color:var(--teal);color:#fff}
+.score-btn.PC.selected{background:var(--amber);border-color:var(--amber);color:#fff}
+.score-btn.NC.selected{background:var(--coral);border-color:var(--coral);color:#fff}
+.score-hint{font-size:11px;color:var(--text-hint);margin-top:4px}
+
+/* PHOTO UPLOAD */
+.photo-wrap{margin-top:10px}
+.photo-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.photo-label-row span{font-size:12px;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:.05em}
+.photo-count{font-size:11px;color:var(--text-hint)}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.photo-thumb{position:relative;aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;background:var(--gray)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-thumb .remove{position:absolute;top:4px;right:4px;width:20px;height:20px;background:rgba(0,0,0,0.6);border-radius:50%;border:none;color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.photo-add{aspect-ratio:1;border-radius:var(--radius-sm);border:2px dashed var(--gray-mid);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--gray);transition:all .2s}
+.photo-add:active{background:var(--gray-mid)}
+.photo-add span{font-size:22px;margin-bottom:4px}
+.photo-add p{font-size:11px;color:var(--text-hint);text-align:center}
+.photo-input{display:none}
+.photo-add-btn{width:100%;padding:14px;border-radius:var(--radius-sm);border:2px dashed var(--gray-mid);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;background:var(--gray);transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-sec);-webkit-appearance:none}
+.photo-add-btn:active{background:var(--gray-mid)}
+
+/* SUB AREA */
+.sub-area{border:1px solid var(--gray-mid);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px}
+.sub-area:last-child{margin-bottom:0}
+.sub-area-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.sub-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+.sub-badge.bersih{background:var(--teal-light);color:var(--teal)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--gray-mid);margin:14px 0}
+
+/* SUMMARY CARD */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.sum-item{background:var(--gray);border-radius:var(--radius-sm);padding:10px 12px}
+.sum-item label{font-size:10px;font-weight:700;color:var(--text-sec);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.sum-score{font-size:18px;font-weight:700}
+.sum-score.C{color:var(--teal)}.sum-score.PC{color:var(--amber)}.sum-score.NC{color:var(--coral)}.sum-score.none{color:var(--text-hint)}
+.sum-weight{font-size:11px;color:var(--text-hint)}
+
+/* RECOMMENDATION */
+.rec-box{border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;border-left:4px solid}
+.rec-box.OK{background:var(--teal-light);border-color:var(--teal)}
+.rec-box.PERHATIAN{background:var(--amber-light);border-color:var(--amber)}
+.rec-box.ESKALASI{background:var(--coral-light);border-color:var(--coral)}
+.rec-box h3{font-size:14px;font-weight:700;margin-bottom:4px}
+.rec-box p{font-size:12px;color:var(--text-sec);line-height:1.5}
+.rec-box.OK h3{color:var(--teal)}.rec-box.PERHATIAN h3{color:var(--amber)}.rec-box.ESKALASI h3{color:var(--coral)}
+
+/* NAV BUTTONS */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--white);border-top:1px solid var(--gray-mid);padding:12px 16px;display:flex;gap:10px;z-index:200}
+.btn{flex:1;padding:13px;border-radius:var(--radius-sm);border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-back{background:var(--gray);color:var(--text-sec)}
+.btn-next{background:var(--blue);color:#fff}
+.btn-submit{background:var(--teal);color:#fff}
+.btn:active{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* STATUS */
+.status-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;padding:24px}
+.status-overlay.visible{display:flex}
+.status-box{background:var(--white);border-radius:var(--radius);padding:28px 24px;text-align:center;max-width:340px;width:100%}
+.status-icon{font-size:48px;margin-bottom:12px}
+.status-box h2{font-size:18px;font-weight:700;margin-bottom:8px}
+.status-box p{font-size:14px;color:var(--text-sec);line-height:1.5;margin-bottom:20px}
+.btn-close{width:100%;padding:13px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+
+/* LOADING */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,0.9);z-index:400;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loading-overlay.visible{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--gray-mid);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(min-width:480px){body{max-width:480px;margin:0 auto}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">PT Ruang Tidur Indonesia</div>
+      <h1>Form Validasi Mingguan</h1>
+    </div>
+    <div class="week-badge" id="week-badge">—</div>
+  </div>
+</div>
+
+<!-- STEPS -->
+<div class="steps">
+  <button type="button" class="step active" onclick="goStep(1)"><span class="step-num">1</span>Info</button>
+  <button type="button" class="step" onclick="goStep(2)"><span class="step-num">2</span>Bersih</button>
+  <button type="button" class="step" onclick="goStep(3)"><span class="step-num">3</span>Yanolja</button>
+  <button type="button" class="step" onclick="goStep(4)"><span class="step-num">4</span>Ops</button>
+  <button type="button" class="step" onclick="goStep(5)"><span class="step-num">5</span>Keu</button>
+  <button type="button" class="step" onclick="goStep(6)"><span class="step-num">6</span>Tim</button>
+  <button type="button" class="step" onclick="goStep(7)"><span class="step-num">7</span>Summary</button>
+</div>
+
+<!-- ═══ PAGE 1: INFO ═══ -->
+<div id="page-1" class="page visible">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:#E6F1FB">📋</div>
+      <div><h2>Informasi Validasi</h2><p>Isi data umum sebelum mulai pengecekan</p></div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Nama Assistant Manager</label>
+        <input type="text" id="nama-am" placeholder="Nama lengkap" />
+      </div>
+      <div class="field">
+        <label>Cabang yang Divalidasi</label>
+        <select id="cabang">
+          <option value="">— Pilih cabang —</option>
+          <option>Sans Hotel Cibanteng</option>
+          <option>Bubulak Inn</option>
+          <option>Nirmala Resort</option>
+          <option>Pandu Raya</option>
+          <option>D'Palma Guest House</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Tanggal Validasi</label>
+          <input type="date" id="tgl-validasi" />
+        </div>
+        <div class="field">
+          <label>Minggu Ke-</label>
+          <select id="minggu-ke">
+            <option value="">— Pilih —</option>
+            <option>Minggu 1</option><option>Minggu 2</option>
+            <option>Minggu 3</option><option>Minggu 4</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Nama Leader Cabang</label>
+        <input type="text" id="nama-leader" placeholder="Nama leader cabang" />
+      </div>
+      <div class="field">
+        <label>Catatan Umum (opsional)</label>
+        <textarea id="catatan-umum" placeholder="Kondisi umum cabang saat kunjungan..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2: KEBERSIHAN ═══ -->
+<div id="page-2" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--teal-light)">🧹</div>
+      <div><h2>Kebersihan & Kerapian</h2><p>Bobot 30% — Cek per sub-area</p></div>
+    </div>
+    <div class="section-body">
+
+      <!-- LOBBY -->
+      <div class="sub-area">
+        <div class="sub-area-title"><span class="sub-badge bersih">1</span>Lobby & Resepsionis</div>
+        <div class="field">
+          <label>Score</label>
+          <div class="score-group">
+            <button type="button" class="score-btn C" onclick="setScore(this,\'bersih-lobby\')">✅ C</button>
+            <button type="button" class="score-btn PC" onclick="setScore(this,\'bersih-lobby\')">⚠️ PC</button>
+            <button type="button" class="score-btn NC" onclick="setScore(this,\'bersih-lobby\')">❌ NC</button>
+          </div>
+          <div class="score-hint">C = Compliant &nbsp;|&nbsp; PC = Partial &nbsp;|&nbsp; NC = Non-Compliant</div>
+        </div>
+        <div class="field">
+          <label>Catatan Temuan</label>
+          <textarea id="cat-bersih-lobby" placeholder="Kondisi lantai, meja, bau, kerapian..."></textarea>
+        </div>
+        <div class="field">
+          <label>Action Required</label>
+          <textarea id="act-bersih-lobby" placeholder="Tindakan yang harus dilakukan..."></textarea>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-label-row">
+            <span>Foto Bukti</span>
+            <span class="photo-count" id="pc-bersih-lobby">0 foto</span>
+          </div>
+          <div class="photo-grid" id="pg-bersih-lobby"></div>
+          <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'bersih-lobby\')">📷 Tambah foto</button>
+          <input type="file" class="photo-input" id="pi-bersih-lobby" accept="image/*" multiple onchange="handlePhoto(this,'bersih-lobby')">
+        </div>
+      </div>
+
+      <!-- KORIDOR -->
+      <div class="sub-area">
+        <div class="sub-area-title"><span class="sub-badge bersih">2</span>Koridor & Tangga</div>
+        <div class="field">
+          <label>Score</label>
+          <div class="score-group">
+            <button type="button" class="score-btn C" onclick="setScore(this,\'bersih-koridor\')">✅ C</button>
+            <button type="button" class="score-btn PC" onclick="setScore(this,\'bersih-koridor\')">⚠️ PC</button>
+            <button type="button" class="score-btn NC" onclick="setScore(this,\'bersih-koridor\')">❌ NC</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catatan Temuan</label>
+          <textarea id="cat-bersih-koridor" placeholder="Kondisi lantai, sampah, lampu, tangga..."></textarea>
+        </div>
+        <div class="field">
+          <label>Action Required</label>
+          <textarea id="act-bersih-koridor" placeholder="Tindakan yang harus dilakukan..."></textarea>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-label-row">
+            <span>Foto Bukti</span>
+            <span class="photo-count" id="pc-bersih-koridor">0 foto</span>
+          </div>
+          <div class="photo-grid" id="pg-bersih-koridor"></div>
+          <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'bersih-koridor\')">📷 Tambah foto</button>
+          <input type="file" class="photo-input" id="pi-bersih-koridor" accept="image/*" multiple onchange="handlePhoto(this,'bersih-koridor')">
+        </div>
+      </div>
+
+      <!-- GUDANG -->
+      <div class="sub-area">
+        <div class="sub-area-title"><span class="sub-badge bersih">3</span>Gudang</div>
+        <div class="field">
+          <label>Score</label>
+          <div class="score-group">
+            <button type="button" class="score-btn C" onclick="setScore(this,\'bersih-gudang\')">✅ C</button>
+            <button type="button" class="score-btn PC" onclick="setScore(this,\'bersih-gudang\')">⚠️ PC</button>
+            <button type="button" class="score-btn NC" onclick="setScore(this,\'bersih-gudang\')">❌ NC</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catatan Temuan</label>
+          <textarea id="cat-bersih-gudang" placeholder="Kerapian stok, kebersihan, penataan..."></textarea>
+        </div>
+        <div class="field">
+          <label>Action Required</label>
+          <textarea id="act-bersih-gudang" placeholder="Tindakan yang harus dilakukan..."></textarea>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-label-row">
+            <span>Foto Bukti</span>
+            <span class="photo-count" id="pc-bersih-gudang">0 foto</span>
+          </div>
+          <div class="photo-grid" id="pg-bersih-gudang"></div>
+          <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'bersih-gudang\')">📷 Tambah foto</button>
+          <input type="file" class="photo-input" id="pi-bersih-gudang" accept="image/*" multiple onchange="handlePhoto(this,'bersih-gudang')">
+        </div>
+      </div>
+
+      <!-- KAMAR -->
+      <div class="sub-area">
+        <div class="sub-area-title"><span class="sub-badge bersih">4</span>Kamar (rata-rata min. 4 kamar)</div>
+        <div class="field">
+          <label>Nomor Kamar yang Dicek</label>
+          <input type="text" id="nomor-kamar" placeholder="Contoh: 101, 102, 203, 301" />
+        </div>
+        <div class="field">
+          <label>Score Rata-rata</label>
+          <div class="score-group">
+            <button type="button" class="score-btn C" onclick="setScore(this,\'bersih-kamar\')">✅ C</button>
+            <button type="button" class="score-btn PC" onclick="setScore(this,\'bersih-kamar\')">⚠️ PC</button>
+            <button type="button" class="score-btn NC" onclick="setScore(this,\'bersih-kamar\')">❌ NC</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catatan Temuan</label>
+          <textarea id="cat-bersih-kamar" placeholder="Kebersihan kamar, kamar mandi, kelengkapan amenities..."></textarea>
+        </div>
+        <div class="field">
+          <label>Action Required</label>
+          <textarea id="act-bersih-kamar" placeholder="Tindakan yang harus dilakukan..."></textarea>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-label-row">
+            <span>Foto Bukti</span>
+            <span class="photo-count" id="pc-bersih-kamar">0 foto</span>
+          </div>
+          <div class="photo-grid" id="pg-bersih-kamar"></div>
+          <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'bersih-kamar\')">📷 Tambah foto</button>
+          <input type="file" class="photo-input" id="pi-bersih-kamar" accept="image/*" multiple onchange="handlePhoto(this,'bersih-kamar')">
+        </div>
+      </div>
+
+      <!-- MUSHOLA -->
+      <div class="sub-area">
+        <div class="sub-area-title"><span class="sub-badge bersih">5</span>Area Lainnya (Mushola, dll)</div>
+        <div class="field">
+          <label>Score</label>
+          <div class="score-group">
+            <button type="button" class="score-btn C" onclick="setScore(this,\'bersih-lain\')">✅ C</button>
+            <button type="button" class="score-btn PC" onclick="setScore(this,\'bersih-lain\')">⚠️ PC</button>
+            <button type="button" class="score-btn NC" onclick="setScore(this,\'bersih-lain\')">❌ NC</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Catatan Temuan</label>
+          <textarea id="cat-bersih-lain" placeholder="Kondisi mushola, sajadah, kebersihan..."></textarea>
+        </div>
+        <div class="field">
+          <label>Action Required</label>
+          <textarea id="act-bersih-lain" placeholder="Tindakan yang harus dilakukan..."></textarea>
+        </div>
+        <div class="photo-wrap">
+          <div class="photo-label-row">
+            <span>Foto Bukti</span>
+            <span class="photo-count" id="pc-bersih-lain">0 foto</span>
+          </div>
+          <div class="photo-grid" id="pg-bersih-lain"></div>
+          <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'bersih-lain\')">📷 Tambah foto</button>
+          <input type="file" class="photo-input" id="pi-bersih-lain" accept="image/*" multiple onchange="handlePhoto(this,'bersih-lain')">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 3: YANOLJA ═══ -->
+<div id="page-3" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--purple-light)">💻</div>
+      <div><h2>Penggunaan Sistem Yanolja</h2><p>Bobot 25% — Kepatuhan & akurasi data</p></div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Score Keseluruhan</label>
+        <div class="score-group">
+          <button type="button" class="score-btn C" onclick="setScore(this,\'yanolja\')">✅ C</button>
+          <button type="button" class="score-btn PC" onclick="setScore(this,\'yanolja\')">⚠️ PC</button>
+          <button type="button" class="score-btn NC" onclick="setScore(this,\'yanolja\')">❌ NC</button>
+        </div>
+        <div class="score-hint">Cek: semua transaksi terinput, leader bisa pull report mandiri, data akurat</div>
+      </div>
+      <div class="field">
+        <label>Transaksi tidak terinput?</label>
+        <select id="yanolja-missing">
+          <option value="">— Pilih —</option>
+          <option>Tidak ada (semua terinput)</option>
+          <option>1–3 transaksi terlewat</option>
+          <option>Lebih dari 3 transaksi terlewat</option>
+          <option>Banyak transaksi tidak terinput</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Kemampuan leader pull report mandiri</label>
+        <select id="yanolja-leader">
+          <option value="">— Pilih —</option>
+          <option>Bisa mandiri dengan lancar</option>
+          <option>Bisa tapi masih perlu bantuan</option>
+          <option>Belum bisa mandiri</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Catatan Temuan</label>
+        <textarea id="cat-yanolja" placeholder="Temuan spesifik penggunaan Yanolja..."></textarea>
+      </div>
+      <div class="field">
+        <label>Action Required</label>
+        <textarea id="act-yanolja" placeholder="Tindakan yang harus dilakukan..."></textarea>
+      </div>
+      <div class="photo-wrap">
+        <div class="photo-label-row">
+          <span>Foto Bukti</span>
+          <span class="photo-count" id="pc-yanolja">0 foto</span>
+        </div>
+        <div class="photo-grid" id="pg-yanolja"></div>
+        <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'yanolja\')">📷 Tambah foto (screenshot dashboard)</button>
+        <input type="file" class="photo-input" id="pi-yanolja" accept="image/*" multiple onchange="handlePhoto(this,'yanolja')">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 4: OPERASIONAL ═══ -->
+<div id="page-4" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--blue-light)">🏨</div>
+      <div><h2>Operasional Front Desk & Kamar</h2><p>Bobot 20% — Pelayanan & SOP</p></div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Score</label>
+        <div class="score-group">
+          <button type="button" class="score-btn C" onclick="setScore(this,\'operasional\')">✅ C</button>
+          <button type="button" class="score-btn PC" onclick="setScore(this,\'operasional\')">⚠️ PC</button>
+          <button type="button" class="score-btn NC" onclick="setScore(this,\'operasional\')">❌ NC</button>
+        </div>
+        <div class="score-hint">Cek: waktu check-in/out, upselling, handling komplain, SOP pelayanan</div>
+      </div>
+      <div class="field">
+        <label>Catatan Temuan</label>
+        <textarea id="cat-operasional" placeholder="Kondisi pelayanan front desk, proses check-in/out, upselling transit+fullday..."></textarea>
+      </div>
+      <div class="field">
+        <label>Action Required</label>
+        <textarea id="act-operasional" placeholder="Tindakan yang harus dilakukan..."></textarea>
+      </div>
+      <div class="photo-wrap">
+        <div class="photo-label-row">
+          <span>Foto Bukti</span>
+          <span class="photo-count" id="pc-operasional">0 foto</span>
+        </div>
+        <div class="photo-grid" id="pg-operasional"></div>
+        <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'operasional\')">📷 Tambah foto</button>
+        <input type="file" class="photo-input" id="pi-operasional" accept="image/*" multiple onchange="handlePhoto(this,'operasional')">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 5: KEUANGAN ═══ -->
+<div id="page-5" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--amber-light)">💰</div>
+      <div><h2>Keuangan & Administrasi</h2><p>Bobot 15% — Cash report & dokumentasi</p></div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Score</label>
+        <div class="score-group">
+          <button type="button" class="score-btn C" onclick="setScore(this,\'keuangan\')">✅ C</button>
+          <button type="button" class="score-btn PC" onclick="setScore(this,\'keuangan\')">⚠️ PC</button>
+          <button type="button" class="score-btn NC" onclick="setScore(this,\'keuangan\')">❌ NC</button>
+        </div>
+        <div class="score-hint">Cek: cash report akurat, bukti transaksi lengkap, arsip rapi</div>
+      </div>
+      <div class="field">
+        <label>Catatan Temuan</label>
+        <textarea id="cat-keuangan" placeholder="Kondisi cash report, kelengkapan bukti transaksi, kerapian arsip..."></textarea>
+      </div>
+      <div class="field">
+        <label>Action Required</label>
+        <textarea id="act-keuangan" placeholder="Tindakan yang harus dilakukan..."></textarea>
+      </div>
+      <div class="photo-wrap">
+        <div class="photo-label-row">
+          <span>Foto Bukti</span>
+          <span class="photo-count" id="pc-keuangan">0 foto</span>
+        </div>
+        <div class="photo-grid" id="pg-keuangan"></div>
+        <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'keuangan\')">📷 Tambah foto</button>
+        <input type="file" class="photo-input" id="pi-keuangan" accept="image/*" multiple onchange="handlePhoto(this,'keuangan')">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 6: TIM ═══ -->
+<div id="page-6" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--green-light)">👥</div>
+      <div><h2>Tim & Kehadiran</h2><p>Bobot 10% — Disiplin & grooming</p></div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label>Score</label>
+        <div class="score-group">
+          <button type="button" class="score-btn C" onclick="setScore(this,\'tim\')">✅ C</button>
+          <button type="button" class="score-btn PC" onclick="setScore(this,\'tim\')">⚠️ PC</button>
+          <button type="button" class="score-btn NC" onclick="setScore(this,\'tim\')">❌ NC</button>
+        </div>
+        <div class="score-hint">Cek: absensi, grooming, disiplin waktu, briefing berjalan</div>
+      </div>
+      <div class="field">
+        <label>Catatan Temuan</label>
+        <textarea id="cat-tim" placeholder="Kondisi kehadiran, grooming staff, disiplin shift..."></textarea>
+      </div>
+      <div class="field">
+        <label>Action Required</label>
+        <textarea id="act-tim" placeholder="Tindakan yang harus dilakukan..."></textarea>
+      </div>
+      <div class="photo-wrap">
+        <div class="photo-label-row">
+          <span>Foto Bukti</span>
+          <span class="photo-count" id="pc-tim">0 foto</span>
+        </div>
+        <div class="photo-grid" id="pg-tim"></div>
+        <button type="button" class="photo-add-btn" onclick="triggerPhoto(\'tim\')">📷 Tambah foto</button>
+        <input type="file" class="photo-input" id="pi-tim" accept="image/*" multiple onchange="handlePhoto(this,'tim')">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 7: SUMMARY ═══ -->
+<div id="page-7" class="page">
+  <div class="section-card" style="margin-top:14px">
+    <div class="section-head">
+      <div class="section-icon" style="background:var(--blue-light)">📊</div>
+      <div><h2>Ringkasan Validasi</h2><p id="sum-cabang-label">—</p></div>
+    </div>
+    <div class="section-body">
+      <div class="summary-grid" id="summary-grid"></div>
+      <div id="recommendation-box" class="rec-box OK">
+        <h3 id="rec-title">—</h3>
+        <p id="rec-desc">—</p>
+      </div>
+      <div class="field">
+        <label>Kesimpulan & Catatan Akhir</label>
+        <textarea id="kesimpulan" placeholder="Kesimpulan keseluruhan hasil validasi minggu ini..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <p style="font-size:14px;color:var(--text-sec)">Mengirim data ke Google Sheets...</p>
+</div>
+
+<!-- STATUS -->
+<div class="status-overlay" id="status-overlay">
+  <div class="status-box">
+    <div class="status-icon" id="status-icon">✅</div>
+    <h2 id="status-title">Berhasil!</h2>
+    <p id="status-msg">Data validasi berhasil dikirim ke Google Sheets.</p>
+    <button type="button" class="btn-close" onclick="closeStatus()">Tutup</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-bar">
+  <button type="button" class="btn btn-back" id="btn-back" onclick="prevStep()" style="display:none">← Kembali</button>
+  <button type="button" class="btn btn-next" id="btn-next" onclick="nextStep()">Lanjut →</button>
+  <button type="button" class="btn btn-submit" id="btn-submit" onclick="submitForm()" style="display:none">Kirim Laporan ✓</button>
+</div>
+
+<script>
+// ── CONFIG ──
+// Ganti dengan URL Google Apps Script Anda setelah deploy
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvBjF7qnp60_SFPhcyDDoORhO6pslZOZyPDiM_OiObEky88Eq6PjAV_8ORlPim4eHsQw/exec';
+
+// ── STATE ──
+let currentStep = 1;
+const totalSteps = 7;
+const scores = {};
+const photos = {};
+
+// ── INIT ──
+const now = new Date();
+const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+document.getElementById('week-badge').textContent = hari[now.getDay()]+', '+now.getDate()+' '+bulan[now.getMonth()]+' '+now.getFullYear();
+document.getElementById('tgl-validasi').value = now.toISOString().split('T')[0];
+
+// ── SCORE ──
+function setScore(btn, area) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  scores[area] = btn.classList.contains('C') ? 'C' : btn.classList.contains('PC') ? 'PC' : 'NC';
+  if (currentStep === 7) renderSummary();
+}
+
+// ── PHOTO ──
+function triggerPhoto(area) {
+  document.getElementById('pi-' + area).click();
+}
+
+function handlePhoto(input, area) {
+  if (!photos[area]) photos[area] = [];
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      photos[area].push({ name: file.name, data: e.target.result });
+      renderPhotos(area);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderPhotos(area) {
+  const grid = document.getElementById('pg-' + area);
+  const count = document.getElementById('pc-' + area);
+  if (!grid) return;
+  grid.innerHTML = '';
+  (photos[area] || []).forEach((p, i) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'photo-thumb';
+    thumb.innerHTML = `<img src="${p.data}" alt="foto"><button class="remove" onclick="removePhoto('${area}',${i})">×</button>`;
+    grid.appendChild(thumb);
+  });
+  if (count) count.textContent = (photos[area]||[]).length + ' foto';
+}
+
+function removePhoto(area, idx) {
+  photos[area].splice(idx, 1);
+  renderPhotos(area);
+}
+
+// ── NAVIGATION ──
+function goStep(step) {
+  document.getElementById('page-' + currentStep).classList.remove('visible');
+  document.querySelectorAll('.step')[currentStep - 1].classList.remove('active');
+  document.querySelectorAll('.step')[currentStep - 1].classList.add('done');
+  currentStep = step;
+  document.getElementById('page-' + currentStep).classList.add('visible');
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active');
+    if (i + 1 === currentStep) s.classList.add('active');
+  });
+  updateNav();
+  if (currentStep === 7) renderSummary();
+  window.scrollTo(0, 0);
+}
+
+function nextStep() { if (currentStep < totalSteps) goStep(currentStep + 1); }
+function prevStep() { if (currentStep > 1) goStep(currentStep - 1); }
+
+function updateNav() {
+  document.getElementById('btn-back').style.display = currentStep > 1 ? 'block' : 'none';
+  document.getElementById('btn-next').style.display = currentStep < totalSteps ? 'block' : 'none';
+  document.getElementById('btn-submit').style.display = currentStep === totalSteps ? 'block' : 'none';
+}
+
+// ── SUMMARY ──
+const areaConfig = [
+  { key: 'kebersihan', label: 'Kebersihan', bobot: 30, subkeys: ['bersih-lobby','bersih-koridor','bersih-gudang','bersih-kamar','bersih-lain'] },
+  { key: 'yanolja', label: 'Yanolja', bobot: 25 },
+  { key: 'operasional', label: 'Operasional', bobot: 20 },
+  { key: 'keuangan', label: 'Keuangan', bobot: 15 },
+  { key: 'tim', label: 'Tim', bobot: 10 },
+];
+
+function getScoreVal(s) { return s === 'C' ? 1 : s === 'PC' ? 0.5 : s === 'NC' ? 0 : null; }
+
+function getAreaScore(area) {
+  if (area.subkeys) {
+    const vals = area.subkeys.map(k => getScoreVal(scores[k])).filter(v => v !== null);
+    if (vals.length === 0) return null;
+    const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+    return avg >= 0.75 ? 'C' : avg >= 0.4 ? 'PC' : 'NC';
+  }
+  return scores[area.key] || null;
+}
+
+function renderSummary() {
+  const cabang = document.getElementById('cabang').value || '—';
+  const tgl = document.getElementById('tgl-validasi').value || '—';
+  document.getElementById('sum-cabang-label').textContent = cabang + ' · ' + tgl;
+
+  let totalWeight = 0, totalScore = 0;
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = '';
+
+  areaConfig.forEach(area => {
+    const sc = getAreaScore(area);
+    const val = getScoreVal(sc);
+    if (val !== null) { totalScore += val * area.bobot; totalWeight += area.bobot; }
+    const div = document.createElement('div');
+    div.className = 'sum-item';
+    div.innerHTML = `<label>${area.label} (${area.bobot}%)</label><div class="sum-score ${sc||'none'}">${sc||'—'}</div><div class="sum-weight">${area.bobot}% bobot</div>`;
+    grid.appendChild(div);
+  });
+
+  // Overall
+  let overall = '—', rec = 'OK', recTitle = '—', recDesc = '—';
+  if (totalWeight > 0) {
+    const pct = totalScore / totalWeight;
+    overall = pct >= 0.75 ? 'C' : pct >= 0.4 ? 'PC' : 'NC';
+    if (overall === 'C') { rec = 'OK'; recTitle = '✅ Cabang OK'; recDesc = 'Semua area dalam kondisi baik. Pertahankan standar ini minggu depan.'; }
+    else if (overall === 'PC') { rec = 'PERHATIAN'; recTitle = '⚠️ Perlu Perhatian'; recDesc = 'Beberapa area perlu perbaikan. Pastikan action required ditindaklanjuti sebelum validasi berikutnya.'; }
+    else { rec = 'ESKALASI'; recTitle = '❌ Eskalasi ke P1 (Yudi)'; recDesc = 'Cabang memerlukan perhatian segera. Laporkan ke General Area Manager untuk tindak lanjut.'; }
+  }
+
+  const overallDiv = document.createElement('div');
+  overallDiv.className = 'sum-item';
+  overallDiv.style.gridColumn = '1 / -1';
+  overallDiv.innerHTML = `<label>Score Keseluruhan</label><div class="sum-score ${overall}" style="font-size:24px">${overall}</div>`;
+  grid.appendChild(overallDiv);
+
+  const recBox = document.getElementById('recommendation-box');
+  recBox.className = 'rec-box ' + rec;
+  document.getElementById('rec-title').textContent = recTitle;
+  document.getElementById('rec-desc').textContent = recDesc;
+}
+
+// ── SUBMIT ──
+async function submitForm() {
+  const cabang = document.getElementById('cabang').value;
+  const nama = document.getElementById('nama-am').value;
+  if (!cabang || !nama) {
+    showStatus('error', 'Data Tidak Lengkap', 'Pastikan nama assistant manager dan cabang sudah diisi di halaman pertama.');
+    return;
+  }
+
+  document.getElementById('loading').classList.add('visible');
+
+  // Kumpulkan semua data
+  const formData = {
+    timestamp: new Date().toISOString(),
+    nama_am: nama,
+    cabang: cabang,
+    tanggal: document.getElementById('tgl-validasi').value,
+    minggu: document.getElementById('minggu-ke').value,
+    nama_leader: document.getElementById('nama-leader').value,
+    catatan_umum: document.getElementById('catatan-umum').value,
+
+    // Kebersihan sub-area
+    score_lobby: scores['bersih-lobby']||'',
+    cat_lobby: document.getElementById('cat-bersih-lobby').value,
+    act_lobby: document.getElementById('act-bersih-lobby').value,
+
+    score_koridor: scores['bersih-koridor']||'',
+    cat_koridor: document.getElementById('cat-bersih-koridor').value,
+    act_koridor: document.getElementById('act-bersih-koridor').value,
+
+    score_gudang: scores['bersih-gudang']||'',
+    cat_gudang: document.getElementById('cat-bersih-gudang').value,
+    act_gudang: document.getElementById('act-bersih-gudang').value,
+
+    nomor_kamar: document.getElementById('nomor-kamar').value,
+    score_kamar: scores['bersih-kamar']||'',
+    cat_kamar: document.getElementById('cat-bersih-kamar').value,
+    act_kamar: document.getElementById('act-bersih-kamar').value,
+
+    score_lain: scores['bersih-lain']||'',
+    cat_lain: document.getElementById('cat-bersih-lain').value,
+    act_lain: document.getElementById('act-bersih-lain').value,
+
+    // Yanolja
+    score_yanolja: scores['yanolja']||'',
+    yanolja_missing: document.getElementById('yanolja-missing').value,
+    yanolja_leader: document.getElementById('yanolja-leader').value,
+    cat_yanolja: document.getElementById('cat-yanolja').value,
+    act_yanolja: document.getElementById('act-yanolja').value,
+
+    // Operasional
+    score_operasional: scores['operasional']||'',
+    cat_operasional: document.getElementById('cat-operasional').value,
+    act_operasional: document.getElementById('act-operasional').value,
+
+    // Keuangan
+    score_keuangan: scores['keuangan']||'',
+    cat_keuangan: document.getElementById('cat-keuangan').value,
+    act_keuangan: document.getElementById('act-keuangan').value,
+
+    // Tim
+    score_tim: scores['tim']||'',
+    cat_tim: document.getElementById('cat-tim').value,
+    act_tim: document.getElementById('act-tim').value,
+
+    kesimpulan: document.getElementById('kesimpulan').value,
+
+    // Photos as base64
+    photos: photos
+  };
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(formData)
+    });
+    const result = await res.json();
+    document.getElementById('loading').classList.remove('visible');
+    if (result.status === 'ok') {
+      showStatus('success', 'Berhasil Dikirim!', 'Data validasi & foto telah tersimpan di Google Sheets dan Google Drive.');
+    } else {
+      showStatus('error', 'Gagal Mengirim', 'Terjadi kesalahan: ' + (result.message || 'Coba lagi.'));
+    }
+  } catch (e) {
+    document.getElementById('loading').classList.remove('visible');
+    showStatus('error', 'Koneksi Gagal', 'Pastikan HP terhubung internet lalu coba lagi.');
+  }
+}
+
+function showStatus(type, title, msg) {
+  document.getElementById('status-icon').textContent = type === 'success' ? '✅' : '❌';
+  document.getElementById('status-title').textContent = title;
+  document.getElementById('status-msg').textContent = msg;
+  document.getElementById('status-overlay').classList.add('visible');
+}
+
+function closeStatus() {
+  document.getElementById('status-overlay').classList.remove('visible');
+}
+
+updateNav();
+</script>
+</body>
+</html>

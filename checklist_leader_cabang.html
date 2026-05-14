@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist Leader Cabang — PT Ruang Tidur Indonesia</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #1F5C99;
+    --blue-light: #E6F1FB;
+    --blue-mid: #2E75B6;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --amber: #D4870A;
+    --amber-light: #FEF3DC;
+    --coral: #C1440E;
+    --coral-light: #FAECE7;
+    --purple: #5B4DBE;
+    --purple-light: #EEEDFE;
+    --gray: #F7F6F3;
+    --gray-mid: #E8E6E0;
+    --text: #1A1A1A;
+    --text-sec: #6B6B6B;
+    --text-hint: #A0A0A0;
+    --white: #FFFFFF;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--gray);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--blue);
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .hotel-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 2px;
+  }
+  .date-badge {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* GLOBAL PROGRESS */
+  .global-progress {
+    background: rgba(255,255,255,0.12);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+  }
+  .gp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .gp-label { font-size: 12px; color: rgba(255,255,255,0.75); }
+  .gp-count { font-size: 13px; font-weight: 700; color: #fff; }
+  .gp-track {
+    height: 5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .gp-fill {
+    height: 100%;
+    background: #4ECBA5;
+    border-radius: 3px;
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* TOP TABS */
+  .top-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .top-tabs::-webkit-scrollbar { display: none; }
+  .ttab {
+    flex-shrink: 0;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-mid);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-sec);
+    transition: all .2s;
+  }
+  .ttab.active {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+  }
+
+  /* SUB TABS */
+  .sub-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 14px 16px 0;
+  }
+  .stab {
+    flex: 1;
+    padding: 9px 8px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--gray-mid);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-sec);
+    text-align: center;
+    transition: all .2s;
+  }
+  .stab.active {
+    border-color: transparent;
+    color: var(--white);
+  }
+  .stab.pagi.active { background: var(--blue); }
+  .stab.sore.active { background: var(--amber); }
+  .stab.senin.active { background: var(--teal); }
+  .stab.jumat.active { background: var(--purple); }
+
+  /* PAGE & SESI */
+  .page { display: none; }
+  .page.visible { display: block; }
+  .sesi { display: none; }
+  .sesi.visible { display: block; }
+
+  /* SESI PROGRESS */
+  .sesi-progress {
+    margin: 14px 16px 0;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .sp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .sp-label { font-size: 12px; color: var(--text-sec); font-weight: 500; }
+  .sp-count { font-size: 13px; font-weight: 700; color: var(--text); }
+  .sp-track {
+    height: 6px;
+    background: var(--gray-mid);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .sp-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .4s cubic-bezier(.4,0,.2,1);
+  }
+  .sp-fill.pagi { background: var(--blue); }
+  .sp-fill.sore { background: var(--amber); }
+  .sp-fill.senin { background: var(--teal); }
+  .sp-fill.jumat { background: var(--purple); }
+
+  /* SECTION CARD */
+  .section-card {
+    margin: 12px 16px 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--gray-mid);
+  }
+  .section-label.blue { color: var(--blue); background: var(--blue-light); }
+  .section-label.amber { color: var(--amber); background: var(--amber-light); }
+  .section-label.teal { color: var(--teal); background: var(--teal-light); }
+  .section-label.coral { color: var(--coral); background: var(--coral-light); }
+  .section-label.purple { color: var(--purple); background: var(--purple-light); }
+  .section-label.gray { color: var(--text-sec); background: var(--gray); }
+
+  /* CHECKLIST ITEM */
+  .cl-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--gray);
+    cursor: pointer;
+    transition: background .15s;
+    user-select: none;
+  }
+  .cl-item:last-child { border-bottom: none; }
+  .cl-item:active { background: var(--gray); }
+  .cl-item.checked { background: #F6FBF9; }
+
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--gray-mid);
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s cubic-bezier(.4,0,.2,1);
+    background: var(--white);
+  }
+  .cl-item.checked .checkbox {
+    background: var(--teal);
+    border-color: var(--teal);
+    transform: scale(1.05);
+  }
+  .checkmark {
+    display: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .cl-item.checked .checkmark { display: block; }
+
+  .cl-body { flex: 1; }
+  .cl-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+    transition: color .2s;
+  }
+  .cl-item.checked .cl-text {
+    text-decoration: line-through;
+    color: var(--text-hint);
+  }
+  .cl-note {
+    font-size: 12px;
+    color: var(--text-hint);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  /* RESET BTN */
+  .reset-wrap {
+    padding: 12px 16px 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .reset-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--gray-mid);
+    cursor: pointer;
+    background: var(--white);
+    color: var(--text-sec);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: all .15s;
+  }
+  .reset-btn:active { background: var(--gray); }
+
+  /* VALIDATOR STRIP */
+  .validator-strip {
+    margin: 14px 16px 0;
+    background: linear-gradient(135deg, #EAF3DE, #E1F5EE);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-left: 3px solid var(--teal);
+  }
+  .val-icon { font-size: 18px; }
+  .val-text { font-size: 12px; color: #085041; font-weight: 500; line-height: 1.4; }
+
+  /* COMPLETE STATE */
+  .complete-banner {
+    margin: 12px 16px 0;
+    background: var(--teal);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  .complete-banner.visible { display: flex; }
+  .complete-banner span { font-size: 13px; font-weight: 600; color: #fff; }
+
+  /* FOOTER */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--gray-mid);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-label { font-size: 11px; color: var(--text-hint); }
+  .footer-brand { font-size: 12px; font-weight: 700; color: var(--blue); }
+
+  @media (min-width: 480px) {
+    body { max-width: 480px; margin: 0 auto; }
+    .header { border-radius: 0 0 var(--radius) var(--radius); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="hotel-name">PT Ruang Tidur Indonesia</div>
+      <h1>Checklist Leader Cabang</h1>
+    </div>
+    <div class="date-badge" id="date-badge">—</div>
+  </div>
+  <div class="global-progress">
+    <div class="gp-row">
+      <span class="gp-label">Progress keseluruhan hari ini</span>
+      <span class="gp-count" id="gp-count">0 / 0</span>
+    </div>
+    <div class="gp-track"><div class="gp-fill" id="gp-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- TOP TABS -->
+<div class="top-tabs">
+  <button class="ttab active" onclick="showPage('harian')">Harian</button>
+  <button class="ttab" onclick="showPage('mingguan')">Mingguan</button>
+</div>
+
+<!-- ══════════════ HARIAN ══════════════ -->
+<div id="page-harian" class="page visible">
+  <div class="validator-strip">
+    <span class="val-icon">✓</span>
+    <div class="val-text">Wajib divalidasi oleh <strong>Assistant Manager</strong> setiap hari</div>
+  </div>
+
+  <div class="sub-tabs" style="padding-top:14px">
+    <button class="stab pagi active" onclick="showSesi('pagi')">Pagi 06.00–09.00</button>
+    <button class="stab sore" onclick="showSesi('sore')">Sore 15.00–18.00</button>
+  </div>
+
+  <!-- SESI PAGI -->
+  <div id="sesi-pagi" class="sesi visible">
+    <div class="sesi-progress">
+      <div class="sp-row">
+        <span class="sp-label">Sesi Pagi</span>
+        <span class="sp-count" id="txt-pagi">0 / 0</span>
+      </div>
+      <div class="sp-track"><div class="sp-fill pagi" id="bar-pagi" style="width:0%"></div></div>
+    </div>
+    <div class="complete-banner" id="done-pagi">
+      <span>Sesi pagi selesai! Kirimkan ke Assistant Manager.</span>
+    </div>
+    <div class="reset-wrap"><button class="reset-btn" onclick="resetSesi('pagi')">Reset sesi pagi</button></div>
+
+    <div class="section-card">
+      <div class="section-label blue">Tim & Kehadiran</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek kehadiran seluruh staff shift pagi</div><div class="cl-note">pastikan semua team mengisi kolabo, catat keterlambatan & ketidakhadiran</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan grooming & seragam staff sesuai standar</div><div class="cl-note">Penampilan rapi, name tag terpasang</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Briefing pagi singkat dengan seluruh tim shift</div><div class="cl-note">Informasi tamu hari ini, kamar bermasalah, target room sold hari ini</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label teal">Kebersihan & Kerapian Area</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Inspeksi kebersihan lobby & area resepsionis</div><div class="cl-note">Lantai bersih, meja rapi, tidak ada bau tidak sedap</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Inspeksi kebersihan koridor & tangga semua lantai</div><div class="cl-note">Tidak ada sampah, lantai kering, lampu menyala</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Inspeksi kebersihan kamar mandi umum / kamar mandi luar</div><div class="cl-note">Bersih, tidak berbau, sabun & tisu tersedia</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek stok perlengkapan kamar (sabun, handuk, tisu, air minum)</div><div class="cl-note">Pastikan stok cukup untuk hari ini</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Spot check minimal 50% kamar yang sudah dibersihkan housekeeping</div><div class="cl-note">Gunakan checklist housekeeping standar</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label amber">Kondisi Fasilitas & Maintenance</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek kondisi AC, air panas, dan listrik kamar sampling</div><div class="cl-note">Minimal 50% kamar acak, catat jika ada kerusakan</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek kondisi pintu, kunci kamar & kunci elektronik</div><div class="cl-note">Semua berfungsi normal, tidak ada yang macet</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek area parkir & pencahayaan eksterior hotel</div><div class="cl-note">Lampu menyala, area bersih & aman</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Laporkan kerusakan baru ke Assistant Manager (jika ada)</div><div class="cl-note">Input ke log maintenance, catat waktu lapor</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label blue">Operasional Front Desk & Kamar</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek daftar check-in & check-out hari ini dari Yanolja</div><div class="cl-note">Pastikan front desk sudah tahu tamu yang akan datang & pergi</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan kamar yang check-out sudah dalam antrian pembersihan</div><div class="cl-note">Koordinasi dengan housekeeping untuk prioritas kamar</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek booking transit yang masuk untuk hari ini</div><div class="cl-note">Pastikan kamar tersedia & siap untuk slot transit</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label coral">Input Data Yanolja</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Verifikasi semua transaksi malam tadi sudah terinput di Yanolja</div><div class="cl-note">Zero transaksi manual yang belum diinput</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek room sold kemarin dari dashboard Yanolja</div><div class="cl-note">Catat angka untuk laporan harian ke Assistant Manager</div></div></div>
+    </div>
+
+    <div class="section-card" style="margin-bottom:0">
+      <div class="section-label gray">Keuangan & Cash Report</div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Hitung & verifikasi kas saldo awal shift pagi</div><div class="cl-note">Cocokkan dengan laporan malam sebelumnya</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'pagi')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan bukti transaksi kemarin terlengkap & tersimpan</div><div class="cl-note">Struk, bukti transfer, & bukti OTA tersimpan rapi</div></div></div>
+    </div>
+  </div>
+
+  <!-- SESI SORE -->
+  <div id="sesi-sore" class="sesi">
+    <div class="sesi-progress">
+      <div class="sp-row">
+        <span class="sp-label">Sesi Sore</span>
+        <span class="sp-count" id="txt-sore">0 / 0</span>
+      </div>
+      <div class="sp-track"><div class="sp-fill sore" id="bar-sore" style="width:0%"></div></div>
+    </div>
+    <div class="complete-banner" id="done-sore">
+      <span>Sesi sore selesai! Kirim laporan ke Assistant Manager sebelum jam 22.00.</span>
+    </div>
+    <div class="reset-wrap"><button class="reset-btn" onclick="resetSesi('sore')">Reset sesi sore</button></div>
+
+    <div class="section-card">
+      <div class="section-label blue">Tim & Serah Terima Shift</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek kehadiran staff shift sore / malam</div><div class="cl-note">Pastikan serah terima shift berjalan dengan baik</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Briefing serah terima shift — sampaikan kondisi tamu & kamar</div><div class="cl-note">Informasi tamu bermasalah, kamar rusak, hal penting hari ini</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label teal">Kebersihan & Re-inspeksi</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Re-inspeksi kebersihan lobby & area umum</div><div class="cl-note">Pastikan tetap bersih & rapi setelah aktivitas siang</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Spot check kamar yang sudah dibersihkan untuk tamu malam</div><div class="cl-note">Minimal 6 kamar, pastikan siap 100%</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek stok perlengkapan kamar untuk kebutuhan malam</div><div class="cl-note">Pastikan tidak kehabisan handuk, sabun, tisu</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label amber">Fasilitas & Maintenance</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Follow up status kerusakan yang dilaporkan pagi tadi</div><div class="cl-note">Sudah diperbaiki? Jika belum, eskalasi ke Assistant Manager</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek pencahayaan eksterior & keamanan malam</div><div class="cl-note">Lampu menyala, CCTV aktif, pintu darurat tidak terhalang</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label blue">Operasional & Room Sold</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Rekap room sold hari ini (transit + fullday per kamar)</div><div class="cl-note">Bandingkan dengan target harian cabang</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek tamu yang belum check-out & konfirmasi status kamar</div><div class="cl-note">Tidak ada kamar terhitung kosong tapi masih terisi tamu</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek & konfirmasi booking masuk untuk besok dari Yanolja</div><div class="cl-note">Siapkan kamar yang akan digunakan besok pagi</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan tidak ada komplain tamu yang belum terselesaikan</div><div class="cl-note">Jika ada, selesaikan atau eskalasi ke Assistant Manager sebelum akhir shift</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label coral">Input Data Yanolja</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan semua transaksi hari ini sudah terinput di Yanolja</div><div class="cl-note">Zero transaksi manual yang tertinggal</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pull laporan room sold hari ini dari Yanolja & kirim ke Assistant Manager</div><div class="cl-note">Screenshot / export, kirim sebelum jam 22.00</div></div></div>
+    </div>
+
+    <div class="section-card" style="margin-bottom:0">
+      <div class="section-label gray">Keuangan & Cash Report</div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Hitung & rekap pendapatan hari ini (cash + transfer + OTA)</div><div class="cl-note">Cocokkan dengan data Yanolja</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Buat laporan cash harian & serahkan ke Assistant Manager</div><div class="cl-note">Sertakan breakdown: transit, fullday, fee reseller yang dibayar</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'sore')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Simpan & arsipkan semua bukti transaksi hari ini</div><div class="cl-note">Fisik & digital, rapi per tanggal</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MINGGUAN ══════════════ -->
+<div id="page-mingguan" class="page">
+  <div class="validator-strip">
+    <span class="val-icon">✓</span>
+    <div class="val-text">Divalidasi oleh <strong>Assistant Manager</strong> setiap Senin & Jumat</div>
+  </div>
+
+  <div class="sub-tabs" style="padding-top:14px">
+    <button class="stab senin active" onclick="showSesiM('senin')">Senin — Awal Minggu</button>
+    <button class="stab jumat" onclick="showSesiM('jumat')">Jumat — Akhir Minggu</button>
+  </div>
+
+  <!-- SENIN -->
+  <div id="sesi-senin" class="sesi visible">
+    <div class="sesi-progress">
+      <div class="sp-row">
+        <span class="sp-label">Checklist Senin</span>
+        <span class="sp-count" id="txt-senin">0 / 0</span>
+      </div>
+      <div class="sp-track"><div class="sp-fill senin" id="bar-senin" style="width:0%"></div></div>
+    </div>
+    <div class="complete-banner" id="done-senin">
+      <span>Checklist Senin selesai! Kirim laporan ke Assistant Manager sebelum jam 12.00.</span>
+    </div>
+    <div class="reset-wrap"><button class="reset-btn" onclick="resetSesiM('senin')">Reset checklist Senin</button></div>
+
+    <div class="section-card">
+      <div class="section-label teal">Review Performa Minggu Lalu</div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Rekap total room sold minggu lalu vs target per hari</div><div class="cl-note">Berapa hari tercapai? Berapa hari di bawah target? Apa penyebabnya?</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Rekap total revenue minggu lalu dari Yanolja</div><div class="cl-note">Bandingkan dengan target mingguan cabang</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Review komplain tamu minggu lalu — sudah semua terselesaikan?</div><div class="cl-note">Catat pola komplain berulang untuk ditindaklanjuti</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Review absensi & disiplin tim minggu lalu</div><div class="cl-note">Catat nama & pelanggaran untuk didiskusikan</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek rata-rata skor kebersihan minggu lalu</div><div class="cl-note">Target ≥85%. Jika tidak tercapai, identifikasi area bermasalah</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label blue">Target & Rencana Minggu Ini</div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Tetapkan target room sold harian minggu ini (weekday vs weekend)</div><div class="cl-note">Sesuaikan dengan booking yang sudah masuk di Yanolja</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek jadwal maintenance & PM minggu ini</div><div class="cl-note">Pastikan tidak bentrok dengan kamar yang sudah dibooking</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek jadwal & ketersediaan tim (cuti, izin) minggu ini</div><div class="cl-note">Pastikan coverage shift aman 7 hari ke depan</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Briefing tim awal minggu — sampaikan target & fokus minggu ini</div><div class="cl-note">Singkat ≤15 menit, semua tim hadir</div></div></div>
+    </div>
+
+    <div class="section-card" style="margin-bottom:0">
+      <div class="section-label amber">Fasilitas, Stok & Pelaporan</div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Inspeksi menyeluruh kondisi fasilitas hotel (semua area)</div><div class="cl-note">Lobby, koridor, kamar sampling (min 5 kamar), area parkir</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek stok perlengkapan kamar & operasional untuk seminggu</div><div class="cl-note">Ajukan permintaan pembelian jika stok di bawah minimum</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'senin')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Kirim laporan mingguan ke Assistant Manager</div><div class="cl-note">Wajib terkirim sebelum jam 12.00 setiap Senin</div></div></div>
+    </div>
+  </div>
+
+  <!-- JUMAT -->
+  <div id="sesi-jumat" class="sesi">
+    <div class="sesi-progress">
+      <div class="sp-row">
+        <span class="sp-label">Checklist Jumat</span>
+        <span class="sp-count" id="txt-jumat">0 / 0</span>
+      </div>
+      <div class="sp-track"><div class="sp-fill jumat" id="bar-jumat" style="width:0%"></div></div>
+    </div>
+    <div class="complete-banner" id="done-jumat">
+      <span>Checklist Jumat selesai! Siap hadapi weekend. Kirim summary ke Assistant Manager.</span>
+    </div>
+    <div class="reset-wrap"><button class="reset-btn" onclick="resetSesiM('jumat')">Reset checklist Jumat</button></div>
+
+    <div class="section-card">
+      <div class="section-label purple">Review Pencapaian Minggu Ini (Senin–Kamis)</div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Rekap room sold Senin–Kamis vs target harian</div><div class="cl-note">Apakah on-track untuk capai target mingguan?</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Review revenue weekday — apakah menuju target bulanan?</div><div class="cl-note">Hitung proyeksi bulan jika tren ini berlanjut</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek GSS (rating tamu) yang masuk minggu ini</div><div class="cl-note">Ada review negatif? Respon & tindak lanjut segera</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Review status kerusakan & maintenance minggu ini</div><div class="cl-note">Semua tertangani? Ada yang perlu eskalasi ke Assistant Manager?</div></div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-label amber">Persiapan Weekend (Sabtu–Minggu)</div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Cek booking weekend yang sudah masuk di Yanolja</div><div class="cl-note">Proyeksikan room sold weekend, pastikan semua kamar siap</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan semua kamar dalam kondisi prima untuk weekend</div><div class="cl-note">Inspeksi kamar yang belum laku & siap dijual transit+fullday</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan stok perlengkapan kamar cukup untuk weekend</div><div class="cl-note">Weekend volume lebih tinggi — antisipasi kebutuhan 2x lipat</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Briefing tim — ingatkan target room sold weekend & SOP upselling</div><div class="cl-note">Tekankan tawaran transit + fullday ke setiap tamu yang sesuai</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan coverage shift weekend terpenuhi (tidak ada kekosongan)</div><div class="cl-note">Konfirmasi jadwal shift Sabtu & Minggu</div></div></div>
+    </div>
+
+    <div class="section-card" style="margin-bottom:0">
+      <div class="section-label gray">Pelaporan Akhir Minggu</div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Kirim summary pencapaian minggu ini ke Assistant Manager</div><div class="cl-note">Room sold, revenue, isu utama, rencana perbaikan minggu depan</div></div></div>
+      <div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Verifikasi semua data minggu ini sudah lengkap di Yanolja</div><div class="cl-note">Tidak ada transaksi yang tertinggal</div></div></div>
+	<div class="cl-item" onclick="toggle(this,'jumat')"><div class="checkbox"><span class="checkmark">✓</span></div><div class="cl-body"><div class="cl-text">Pastikan semua kamar dan area sudah di project dan report ke group WA</div><div class="cl-note">Tidak ada kamar dan area yang belum di project mingguan</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span class="footer-label">Divalidasi: Assistant Manager (P2A)</span>
+  <span class="footer-brand">Ruang Tidur</span>
+</div>
+
+<script>
+// Set tanggal hari ini
+const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const now = new Date();
+document.getElementById('date-badge').textContent =
+  hari[now.getDay()] + ', ' + now.getDate() + ' ' + bulan[now.getMonth()] + ' ' + now.getFullYear();
+
+// Toggle item
+function toggle(el, sesi) {
+  el.classList.toggle('checked');
+  const cb = el.querySelector('.checkbox');
+  cb.classList.toggle('done');
+  updateProgress(sesi);
+  updateGlobal();
+}
+
+// Update progress per sesi
+const sesiList = ['pagi','sore','senin','jumat'];
+
+function updateProgress(sesi) {
+  const items = document.querySelectorAll('#sesi-' + sesi + ' .cl-item');
+  const done = document.querySelectorAll('#sesi-' + sesi + ' .cl-item.checked');
+  const total = items.length;
+  const count = done.length;
+  const pct = total > 0 ? Math.round(count / total * 100) : 0;
+  const bar = document.getElementById('bar-' + sesi);
+  const txt = document.getElementById('txt-' + sesi);
+  const banner = document.getElementById('done-' + sesi);
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = count + ' / ' + total;
+  if (banner) {
+    if (count === total && total > 0) banner.classList.add('visible');
+    else banner.classList.remove('visible');
+  }
+}
+
+function updateGlobal() {
+  let total = 0, done = 0;
+  // Hitung harian aktif saja
+  ['pagi','sore'].forEach(s => {
+    const items = document.querySelectorAll('#sesi-' + s + ' .cl-item');
+    const checked = document.querySelectorAll('#sesi-' + s + ' .cl-item.checked');
+    total += items.length;
+    done += checked.length;
+  });
+  const pct = total > 0 ? Math.round(done / total * 100) : 0;
+  document.getElementById('gp-fill').style.width = pct + '%';
+  document.getElementById('gp-count').textContent = done + ' / ' + total;
+}
+
+function resetSesi(name) {
+  document.querySelectorAll('#sesi-' + name + ' .cl-item').forEach(i => {
+    i.classList.remove('checked');
+    i.querySelector('.checkbox').classList.remove('done');
+  });
+  updateProgress(name);
+  updateGlobal();
+}
+function resetSesiM(name) { resetSesi(name); }
+
+// Tab navigation
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.getElementById('page-' + name).classList.add('visible');
+  document.querySelectorAll('.ttab').forEach(t => t.classList.remove('active'));
+  const idx = {harian:0, mingguan:1};
+  document.querySelectorAll('.ttab')[idx[name]].classList.add('active');
+}
+
+function showSesi(name) {
+  ['pagi','sore'].forEach(s => {
+    document.getElementById('sesi-' + s).classList.remove('visible');
+  });
+  document.getElementById('sesi-' + name).classList.add('visible');
+  document.querySelectorAll('#page-harian .stab').forEach(t => t.classList.remove('active'));
+  const idx = {pagi:0, sore:1};
+  document.querySelectorAll('#page-harian .stab')[idx[name]].classList.add('active');
+}
+
+function showSesiM(name) {
+  ['senin','jumat'].forEach(s => {
+    document.getElementById('sesi-' + s).classList.remove('visible');
+  });
+  document.getElementById('sesi-' + name).classList.add('visible');
+  document.querySelectorAll('#page-mingguan .stab').forEach(t => t.classList.remove('active'));
+  const idx = {senin:0, jumat:1};
+  document.querySelectorAll('#page-mingguan .stab')[idx[name]].classList.add('active');
+}
+
+// Init
+sesiList.forEach(s => updateProgress(s));
+updateGlobal();
+</script>
+</body>
+</html>
